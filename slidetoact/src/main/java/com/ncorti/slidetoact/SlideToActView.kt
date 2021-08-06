@@ -66,12 +66,16 @@ class SlideToActView @JvmOverloads constructor(
 
     /** Height of the drawing area */
     private var mAreaHeight: Int = 0
+
     /** Width of the drawing area */
     private var mAreaWidth: Int = 0
+
     /** Actual Width of the drawing area, used for animations */
     private var mActualAreaWidth: Int = 0
+
     /** Border Radius, default to mAreaHeight/2, -1 when not initialized */
     private var mBorderRadius: Int = -1
+
     /** Margin of the cursor from the outer area */
     private var mActualAreaMargin: Int
     private val mOriginAreaMargin: Int
@@ -197,16 +201,20 @@ class SlideToActView @JvmOverloads constructor(
 
     /** Slider cursor position in percentage (between 0f and 1f) */
     private var mPositionPerc: Float = 0f
+
     /** 1/mPositionPerc */
     private var mPositionPercInv: Float = 1f
 
     /* -------------------- ICONS -------------------- */
 
     private val mIconMargin: Int
+
     /** Margin for Arrow Icon */
     private var mArrowMargin: Int
+
     /** Current angle for Arrow Icon */
     private var mArrowAngle: Float = 0f
+
     /** Margin for Tick Icon */
     private var mTickMargin: Int
 
@@ -242,13 +250,16 @@ class SlideToActView @JvmOverloads constructor(
 
     /** Inner rectangle (used for arrow rotation) */
     private var mInnerRect: RectF
+
     /** Outer rectangle (used for area drawing) */
     private var mOuterRect: RectF
+
     /** Grace value, when mPositionPerc > mGraceValue slider will perform the 'complete' operations */
     private val mGraceValue: Float = 0.8F
 
     /** Last X coordinate for the touch event */
     private var mLastX: Float = 0F
+
     /** Flag to understand if user is moving the slider cursor */
     private var mFlagMoving: Boolean = false
 
@@ -272,6 +283,8 @@ class SlideToActView @JvmOverloads constructor(
 
     /** Public flag to enable complete animation */
     var isAnimateCompletion = true
+
+    var isAlphaTextOnSlide = true
 
     /** Public Slide event listeners */
     var onSlideToActAnimationEventListener: OnSlideToActAnimationEventListener? = null
@@ -355,6 +368,8 @@ class SlideToActView @JvmOverloads constructor(
                     R.styleable.SlideToActView_animate_completion,
                     true
                 )
+                isAlphaTextOnSlide =
+                    getBoolean(R.styleable.SlideToActView_text_alpha_on_slide, true)
                 animDuration = getInteger(
                     R.styleable.SlideToActView_animation_duration,
                     300
@@ -454,7 +469,7 @@ class SlideToActView @JvmOverloads constructor(
         // Text horizontal/vertical positioning (both centered)
         mTextXPosition = mAreaWidth.toFloat() / 2
         mTextYPosition = (mAreaHeight.toFloat() / 2) -
-            (mTextPaint.descent() + mTextPaint.ascent()) / 2
+                (mTextPaint.descent() + mTextPaint.ascent()) / 2
 
         // Make sure the position is recomputed.
         mPosition = 0
@@ -479,7 +494,10 @@ class SlideToActView @JvmOverloads constructor(
         )
 
         // Text alpha
-        mTextPaint.alpha = (255 * mPositionPercInv).toInt()
+        takeIf { isAlphaTextOnSlide }?.let {
+            mTextPaint.alpha = (255 * mPositionPercInv).toInt()
+        }
+
         // Checking if the TextView has a Transformation method applied (e.g. AllCaps).
         val textToDraw = mTextView.transformationMethod?.getTransformation(text, mTextView) ?: text
         canvas.drawText(
@@ -621,11 +639,11 @@ class SlideToActView @JvmOverloads constructor(
      */
     private fun checkInsideButton(x: Float, y: Float): Boolean {
         return (
-            0 < y &&
-                y < mAreaHeight &&
-                mEffectivePosition < x &&
-                x < (mAreaHeight + mEffectivePosition)
-            )
+                0 < y &&
+                        y < mAreaHeight &&
+                        mEffectivePosition < x &&
+                        x < (mAreaHeight + mEffectivePosition)
+                )
     }
 
     /**
@@ -865,8 +883,8 @@ class SlideToActView @JvmOverloads constructor(
             Log.w(
                 TAG,
                 "bumpVibration is set but permissions are unavailable." +
-                    "You must have the permission android.permission.VIBRATE in " +
-                    "AndroidManifest.xml to use bumpVibration"
+                        "You must have the permission android.permission.VIBRATE in " +
+                        "AndroidManifest.xml to use bumpVibration"
             )
             return
         }

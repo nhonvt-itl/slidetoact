@@ -14,7 +14,8 @@
         <com.ncorti.slidetoact.SlideToActView
             style="@style/SlideToActView.Example"
             app:bump_vibration="30"
-            app:text="Bump vibration 30" />
+            app:text="Bump vibration 30"
+            app:text_alpha_on_slide="false" />
 
         <com.ncorti.slidetoact.SlideToActView
             style="@style/SlideToActView.Example"
