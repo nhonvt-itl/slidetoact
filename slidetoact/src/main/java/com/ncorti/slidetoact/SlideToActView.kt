@@ -119,6 +119,15 @@ class SlideToActView @JvmOverloads constructor(
             invalidate()
         }
 
+    /** Outer color foreground used by the slider (primary) for transform to complete */
+    @ColorInt
+    var outerTransformCompleteColor: Int = 0
+        set(value) {
+            field = value
+            mOuterTransformCompletePaint.color = value
+            invalidate()
+        }
+
     /** Inner color used by the slider (secondary, icon and border) */
     @ColorInt
     var innerColor: Int = 0
@@ -239,6 +248,10 @@ class SlideToActView @JvmOverloads constructor(
     /** Paint used for outer elements */
     private val mOuterPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    /** Paint used for outer elements */
+    private val mOuterTransformCompletePaint: Paint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply { alpha = 255 }
+
     /** Paint used for inner elements */
     private val mInnerPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
@@ -253,6 +266,9 @@ class SlideToActView @JvmOverloads constructor(
 
     /** Outer rectangle (used for area drawing) */
     private var mOuterRect: RectF
+
+    /** Outer rectangle foreground for transform color (used for area drawing) */
+    private var mOuterTransformCompleteRect: RectF
 
     /** Grace value, when mPositionPerc > mGraceValue slider will perform the 'complete' operations */
     private val mGraceValue: Float = 0.8F
@@ -286,6 +302,8 @@ class SlideToActView @JvmOverloads constructor(
 
     var isAlphaTextOnSlide = true
 
+    var isOuterTransform = false
+
     /** Public Slide event listeners */
     var onSlideToActAnimationEventListener: OnSlideToActAnimationEventListener? = null
     var onSlideCompleteListener: OnSlideCompleteListener? = null
@@ -294,6 +312,7 @@ class SlideToActView @JvmOverloads constructor(
 
     init {
         val actualOuterColor: Int
+        val actualOuterTransformCompleteColor: Int
         val actualInnerColor: Int
         val actualTextColor: Int
         val actualIconColor: Int
@@ -337,6 +356,9 @@ class SlideToActView @JvmOverloads constructor(
                 )
                 mBorderRadius = getDimensionPixelSize(R.styleable.SlideToActView_border_radius, -1)
 
+                actualOuterTransformCompleteColor =
+                    getColor(R.styleable.SlideToActView_outer_transform_complete_color,
+                        defaultOuter)
                 actualOuterColor = getColor(R.styleable.SlideToActView_outer_color, defaultOuter)
                 actualInnerColor = getColor(R.styleable.SlideToActView_inner_color, defaultWhite)
 
@@ -370,6 +392,8 @@ class SlideToActView @JvmOverloads constructor(
                 )
                 isAlphaTextOnSlide =
                     getBoolean(R.styleable.SlideToActView_text_alpha_on_slide, true)
+                isOuterTransform =
+                    getBoolean(R.styleable.SlideToActView_outer_transform_enable, false)
                 animDuration = getInteger(
                     R.styleable.SlideToActView_animation_duration,
                     300
@@ -430,10 +454,18 @@ class SlideToActView @JvmOverloads constructor(
             mAreaHeight.toFloat()
         )
 
+        mOuterTransformCompleteRect = RectF(
+            mActualAreaWidth.toFloat(),
+            0f,
+            mAreaWidth.toFloat() - mActualAreaWidth.toFloat(),
+            mAreaHeight.toFloat()
+        )
+
         mDrawableTick = loadIconCompat(context, actualCompleteDrawable)
 
         mTextPaint.textAlign = Paint.Align.CENTER
 
+        outerTransformCompleteColor = actualOuterTransformCompleteColor
         outerColor = actualOuterColor
         innerColor = actualInnerColor
         iconColor = actualIconColor
@@ -479,6 +511,11 @@ class SlideToActView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (canvas == null) return
 
+        takeIf { (isOuterTransform) }?.let {
+            mOuterPaint.alpha = (255 * mPositionPercInv).toInt()
+            mOuterTransformCompletePaint.alpha = (255 * (1 - mPositionPercInv)).toInt()
+        }
+
         // Outer area
         mOuterRect.set(
             mActualAreaWidth.toFloat(),
@@ -491,6 +528,19 @@ class SlideToActView @JvmOverloads constructor(
             mBorderRadius.toFloat(),
             mBorderRadius.toFloat(),
             mOuterPaint
+        )
+
+        mOuterTransformCompleteRect.set(
+            mActualAreaWidth.toFloat(),
+            0f,
+            mAreaWidth.toFloat() - mActualAreaWidth.toFloat(),
+            mAreaHeight.toFloat()
+        )
+        canvas.drawRoundRect(
+            mOuterTransformCompleteRect,
+            mBorderRadius.toFloat(),
+            mBorderRadius.toFloat(),
+            mOuterTransformCompletePaint
         )
 
         // Text alpha

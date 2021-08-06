@@ -14,6 +14,8 @@
         <com.ncorti.slidetoact.SlideToActView
             style="@style/SlideToActView.Example"
             app:bump_vibration="30"
+            app:outer_transform_complete_color="@color/colorPrimaryDark"
+            app:outer_transform_enable="true"
             app:text="Bump vibration 30"
             app:text_alpha_on_slide="false" />
 
