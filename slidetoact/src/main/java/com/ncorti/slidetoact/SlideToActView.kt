@@ -304,6 +304,8 @@ class SlideToActView @JvmOverloads constructor(
 
     var isOuterTransform = false
 
+    var isOuterAlpha = false
+
     /** Public Slide event listeners */
     var onSlideToActAnimationEventListener: OnSlideToActAnimationEventListener? = null
     var onSlideCompleteListener: OnSlideCompleteListener? = null
@@ -394,6 +396,8 @@ class SlideToActView @JvmOverloads constructor(
                     getBoolean(R.styleable.SlideToActView_text_alpha_on_slide, true)
                 isOuterTransform =
                     getBoolean(R.styleable.SlideToActView_outer_transform_enable, false)
+                isOuterAlpha =
+                    getBoolean(R.styleable.SlideToActView_outer_color_alpha, false)
                 animDuration = getInteger(
                     R.styleable.SlideToActView_animation_duration,
                     300
@@ -512,7 +516,9 @@ class SlideToActView @JvmOverloads constructor(
         if (canvas == null) return
 
         takeIf { (isOuterTransform) }?.let {
-            mOuterPaint.alpha = (255 * mPositionPercInv).toInt()
+            takeIf { isOuterAlpha.not() }?.let {
+                mOuterPaint.alpha = (255 * mPositionPercInv).toInt()
+            }
             mOuterTransformCompletePaint.alpha = (255 * (1 - mPositionPercInv)).toInt()
         }
 

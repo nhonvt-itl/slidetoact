@@ -12,6 +12,7 @@
         <attr name="icon_margin" format="dimension" />
         <attr name="inner_color" format="color" />
         <attr name="outer_color" format="color" />
+        <attr name="outer_color_alpha" format="boolean" />
         <attr name="outer_transform_complete_color" format="color" />
         <attr name="outer_transform_enable" format="boolean" />
         <attr name="text_color" format="color" />
